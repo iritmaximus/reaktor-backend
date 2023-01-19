@@ -1,20 +1,20 @@
 # Reaktor-backend
 
-##Install dependencies
+## Install dependencies
 
 ```bash
 yarn install
 ```
 
-##Run in dev mode
+## Run in dev mode
 ```bash
 yarn run dev
 ```
 
-##Run in "production"
+## Run in "production"
 ```bash
 yarn run start
 ```
 
-##Deployment
+## Deployment
 Deployed at https://reaktor-backend.fly.dev/
