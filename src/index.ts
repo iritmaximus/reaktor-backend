@@ -8,6 +8,29 @@ const offendingPilots: IPilot[] = [];
 
 
 
+// keeps the data fresh
+const refreshDrones = async () => {
+  await setInterval(async () => {
+    await fetchReaktorApi();
+  }, 5000)
+}
+
+refreshDrones();
+
+const fetchReaktorApi = async () => {
+  const droneData = await getDroneLocations();
+  if (droneData == null) {
+    return null;
+  }
+
+  console.log("checking drone data...");
+  const newOffendingPilots = await checkDroneData(droneData);
+
+  checkNewOffendingPilots(newOffendingPilots);
+}
+
+
+
 
 const checkNewOffendingPilots = (newOffendingPilots: IPilot[]) => {
   // if there is no new pilots, just quit
@@ -51,16 +74,7 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/drones", async (_req, res) => {
-  const droneData = await getDroneLocations();
-  if (droneData == null) {
-    res.send("Error getting the data");
-    return;
-  }
-
-  console.log("checking drone data...");
-  const newOffendingPilots = await checkDroneData(droneData);
-
-  checkNewOffendingPilots(newOffendingPilots);
+  await fetchReaktorApi();
   res.send(offendingPilots);
 });
 
