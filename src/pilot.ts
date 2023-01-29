@@ -10,7 +10,6 @@ export interface IPilot {
 }
 
 export const checkPilot = async (drone: IDroneData): Promise<IPilot> => {
-  console.info("checking offending pilot");
   const url = pilotUrl + drone.serialNumber;
 
   const res = await fetch(url);
@@ -29,6 +28,8 @@ export const checkPilot = async (drone: IDroneData): Promise<IPilot> => {
     phoneNumber,
     violationHappened
   }
+
+  console.log("Offending pilot", pilot.name, "found");
 
   return pilot;
 }

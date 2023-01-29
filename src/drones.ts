@@ -23,7 +23,6 @@ export const getDroneLocations = async () => {
   // parses it to a XML-Document
   let doc: Document;
   try {
-    console.info("response --> document object");
     const resString = await res.text();
     doc =  parseXmlDroneData(resString);
   } catch (e) {
@@ -34,7 +33,6 @@ export const getDroneLocations = async () => {
   // parses that XML to a list of drone objects with the wanted data
   let listOfDrones: IDroneData[];
   try {
-    console.info("document --> list of drones");
     listOfDrones = getDataFromXmlDocument(doc);
     return listOfDrones;
   } catch (e) {
@@ -116,6 +114,7 @@ export const checkDroneData = async (droneData: IDroneData[]) => {
 
   const offendingPilots: IPilot[] = [];
 
+  console.info("Checking drone positions...");
   await Promise.all(droneData.map(async drone => {
     const x = drone.positionX;
     const y = drone.positionY;
@@ -125,6 +124,8 @@ export const checkDroneData = async (droneData: IDroneData[]) => {
       offendingPilots.push(pilot);
     }
   }))
+
+  console.log("Found", offendingPilots.length, "of offending pilots...");
 
   return offendingPilots;
 }
@@ -136,7 +137,7 @@ const checkIfInNoflyzone = (x: number, y: number): Boolean => {
   // calculate the distance from 250, 250 to x, y
   // sqrt(a²-b²) = distance, where a, b = new_cord - old_cord
   const distance = Math.sqrt((starting_point-x)**2+(starting_point-y)**2);
-  console.info("distance of drone to noflyzone center:", distance, "m");
+  // console.info("distance of drone to noflyzone center:", distance, "m");
 
   if (distance < 100) {
     return true;

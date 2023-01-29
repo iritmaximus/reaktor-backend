@@ -4,7 +4,8 @@ import { checkPilot, IPilot } from "./pilot.js";
 
 const app = express();
 const PORT = 5000;
-const offendingPilots: IPilot[] = [];
+const fifteenMinutes = 1000* 60 * 15;
+let offendingPilots: IPilot[] = [];
 
 
 
@@ -12,10 +13,30 @@ const offendingPilots: IPilot[] = [];
 const refreshDrones = async () => {
   await setInterval(async () => {
     await fetchReaktorApi();
-  }, 5000)
+  }, 5000);
 }
 
 refreshDrones();
+
+const filterOldLogs = () => {
+  // run every 5 minutes
+  setInterval(() => {
+    console.log()
+    console.log("Filtering old logs...");
+
+    const pilotCount = offendingPilots.length;
+    offendingPilots = offendingPilots.filter(pilot => {
+      const logAge = new Date().getTime() - pilot.violationHappened.getTime();
+      return logAge < fifteenMinutes;
+    });
+
+    console.log("There is now", offendingPilots.length, "of pilots that have offended the no-fly zone");
+    console.log("Previously there was", pilotCount);
+    console.log()
+  }, 500000);
+}
+
+filterOldLogs();
 
 const fetchReaktorApi = async () => {
   const droneData = await getDroneLocations();
@@ -23,10 +44,11 @@ const fetchReaktorApi = async () => {
     return null;
   }
 
-  console.log("checking drone data...");
   const newOffendingPilots = await checkDroneData(droneData);
 
   checkNewOffendingPilots(newOffendingPilots);
+  console.log("There are currently", offendingPilots.length, "pilots that have offended the no-fly zone");
+  console.log();
 }
 
 
@@ -51,13 +73,6 @@ const checkNewOffendingPilots = (newOffendingPilots: IPilot[]) => {
       if (pilot.name === oldPilot.name) {
         offendingPilots[i] = pilot;
         ifAlreadyInList = true;
-      }
-
-      // remove pilots after 15 minutes to keep the list relatively small
-      const fifteenMinutes = 1000* 60 * 15;
-      // console.log(new Date().getTime() - oldPilot.violationHappened.getTime(), fifteenMinutes)
-      if (oldPilot.violationHappened.getTime() - new Date().getTime() > fifteenMinutes) {
-        offendingPilots.splice(i, 1);
       }
       i++;
     })
