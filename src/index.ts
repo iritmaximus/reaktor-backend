@@ -3,7 +3,7 @@ import { checkDroneData, getDroneLocations } from "./drones.js"; // funny typesc
 import { checkPilot, IPilot } from "./pilot.js";
 
 const app = express();
-const PORT = 5000;
+const PORT = 5050;
 const fifteenMinutes = 1000* 60 * 15;
 let offendingPilots: IPilot[] = [];
 
