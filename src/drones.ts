@@ -15,6 +15,9 @@ export const getDroneLocations = async () => {
   try {
     console.info("fetching data from", droneUrl);
     res = await fetch(droneUrl);
+    if (res.status === 503) {
+        throw Error("Server responded with 503");
+    }
   } catch (e) {
     console.error("Error fetching the information,", e);
     return null;
