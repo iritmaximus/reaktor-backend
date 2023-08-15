@@ -7,14 +7,30 @@ const PORT = 5050;
 const fifteenMinutes = 1000* 60 * 15;
 let offendingPilots: IPilot[] = [];
 
+const fetchReaktorApi = async () => {
+  const droneData = await getDroneLocations();
+  if (droneData == null) {
+    return false;
+  }
+
+  const newOffendingPilots = await checkDroneData(droneData);
+
+  checkNewOffendingPilots(newOffendingPilots);
+  console.log("There are currently", offendingPilots.length, "pilots that have offended the no-fly zone");
+  console.log();
+  return true;
+}
 
 
 // keeps the data fresh
 const refreshDrones = async () => {
-  await setInterval(async () => {
-    await fetchReaktorApi();
-  }, 5000);
+  const recentFetchSuccess = await fetchReaktorApi();
+  if (!recentFetchSuccess) { console.log("Failed to fetch, waiting 60mins for next fetch")}
+  await setTimeout(async () => {
+    await refreshDrones()
+  }, recentFetchSuccess ? 5000 : 60*60*1000);
 }
+
 
 refreshDrones();
 
@@ -38,18 +54,6 @@ const filterOldLogs = () => {
 
 filterOldLogs();
 
-const fetchReaktorApi = async () => {
-  const droneData = await getDroneLocations();
-  if (droneData == null) {
-    return null;
-  }
-
-  const newOffendingPilots = await checkDroneData(droneData);
-
-  checkNewOffendingPilots(newOffendingPilots);
-  console.log("There are currently", offendingPilots.length, "pilots that have offended the no-fly zone");
-  console.log();
-}
 
 
 
